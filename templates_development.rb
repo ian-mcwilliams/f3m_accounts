@@ -5,8 +5,6 @@ require_relative 'excel'
 
 file = Excel.new
 
-file.workbook = RubyXL::Workbook.new
-
 timestamp = DateTime.now.strftime('%y%m%d_%H%M%S')
 file.filepath = "tempxlsx/file_#{timestamp}.xlsx"
 
