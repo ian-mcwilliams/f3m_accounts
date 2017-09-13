@@ -1,11 +1,13 @@
 require 'rubyXL'
 
 class Excel
-  attr_accessor :workbook, :filepath, :worksheet
+  attr_accessor :workbook
 
   def initialize(source: nil)
     if source.class == Hash
       @workbook = source
+    elsif source.class == String
+      read_file(source)
     end
   end
 
@@ -44,5 +46,10 @@ class Excel
     column_index = column_string.chars.inject(0) { |sum, current| sum * 26 + value[current] }
     row_index = cell_key[row_start_index..-1].to_i - 1
     [row_index, column_index]
+  end
+
+  def read_file(path)
+    rubyxl_workbook = RubyXL::Parser.parse(path)
+    @workbook = rubyxl_to_hash(rubyxl_workbook)
   end
 end
