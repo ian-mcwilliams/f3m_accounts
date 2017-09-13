@@ -1,17 +1,22 @@
+require 'rubyXL'
+
 class Excel
-  attr_accessor :workbook, :filepath, :worksheet
+  attr_accessor :workbook
 
   def initialize(source: nil)
     if source
-      # add code to read in from file
+      read_file(source) if source.is_a?(String)
     else
       @workbook = RubyXL::Workbook.new
-      @filepath = nil
-      @worksheet = nil
     end
   end
 
   def save_file
     @workbook.write(@filepath)
+  end
+
+  def read_file(path)
+    rubyxl_workbook = RubyXL::Parser.parse(path)
+    @workbook = rubyxl_to_hash(rubyxl_workbook)
   end
 end
