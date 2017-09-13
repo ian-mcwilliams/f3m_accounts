@@ -43,7 +43,7 @@ class Excel
       rubyxl_worksheet.change_row_font_size(0, 13)
       rubyxl_worksheet.change_row_font_size(1, 12)
 
-      row_index, column_index = cell_key_to_coordinates(cell_key)
+      row_index, column_index = RubyXL::Reference.ref2ind(cell_key)
       rubyxl_worksheet.add_cell(row_index, column_index, attributes[:value])
       rubyxl_worksheet.merge_cells(0, 0, 0, 4) if attributes[:merge]
       rubyxl_worksheet.merge_cells(4, 0, 4, 4) if attributes[:merge]
@@ -61,15 +61,6 @@ class Excel
       rubyxl_worksheet[row_index][column_index].change_border('left' , attributes[:border_left]) if attributes[:border_left]
       rubyxl_worksheet[row_index][column_index].change_border('right' , attributes[:border_right]) if attributes[:border_right]
     end
-  end
-
-  def cell_key_to_coordinates(cell_key)
-    row_start_index = cell_key =~ /\d+/
-    column_string = cell_key[0..row_start_index - 1]
-    value = ('A'..'Z').map.with_index.to_h
-    column_index = column_string.chars.inject(0) { |sum, current| sum * 26 + value[current] }
-    row_index = cell_key[row_start_index..-1].to_i - 1
-    [row_index, column_index]
   end
 
   def read_file(path)
