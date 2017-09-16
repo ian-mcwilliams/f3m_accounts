@@ -73,7 +73,6 @@ class Excel
   def rubyxl_to_hash(rubyxl_workbook)
     workbook_hash = {}
     rubyxl_workbook.each do |worksheet|
-      next unless worksheet.sheet_name == 'E4. Net Sales'
       worksheet_hash = {row_count: worksheet.count, column_count: 1, cells: {}}
       worksheet_to_hash(worksheet, worksheet_hash)
       process_sheet_to_populated_block(worksheet_hash)
