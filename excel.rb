@@ -37,7 +37,6 @@ class Excel
 
       index_b, index_a = RubyXL::Reference.ref2ind(attributes[:merge]) if attributes[:merge]
       rubyxl_worksheet.merge_cells(row_index, column_index, index_a, index_b) if attributes[:merge]
-
       if attributes[:formula]
         rubyxl_worksheet.add_cell(row_index, column_index, '', attributes[:formula]).set_number_format '0.00'
       else
@@ -57,11 +56,12 @@ class Excel
       rubyxl_worksheet[row_index][column_index].set_number_format(attributes[:format]) if attributes[:format]
       rubyxl_worksheet[row_index][column_index].change_font_bold(attributes[:bold]) if attributes[:bold]
 
-      # needs a: change_border_all
-      rubyxl_worksheet[row_index][column_index].change_border('top' , attributes[:border_top]) if attributes[:border_top]
-      rubyxl_worksheet[row_index][column_index].change_border('bottom' , attributes[:border_bottom]) if attributes[:border_bottom]
-      rubyxl_worksheet[row_index][column_index].change_border('left' , attributes[:border_left]) if attributes[:border_left]
-      rubyxl_worksheet[row_index][column_index].change_border('right' , attributes[:border_right]) if attributes[:border_right]
+      if attributes[:border_all]
+        rubyxl_worksheet[row_index][column_index].change_border('top' , attributes[:border_all])
+        rubyxl_worksheet[row_index][column_index].change_border('bottom' , attributes[:border_all])
+        rubyxl_worksheet[row_index][column_index].change_border('left' , attributes[:border_all])
+        rubyxl_worksheet[row_index][column_index].change_border('right' , attributes[:border_all])
+      end
     end
   end
 
