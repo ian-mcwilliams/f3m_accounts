@@ -8,9 +8,12 @@ workbook = {
     filepath: filepath,
     # Sheet1: Master Sheet
     'A1.Cash' => {
+        sheet: {
+            
+        },
         'A1' => {
             value: 'Cash',
-            name: 'consolas',
+            font_style: 'consolas',
             fill: 'c0c0c0',
             align: 'center',
             bold: true,
@@ -19,18 +22,18 @@ workbook = {
         },
         'A2' => {
             value: 'Date',
-            name: 'consolas',
+            font_style: 'consolas',
             align: 'center',
             fill: 'c0c0c0',
             border_all: 'thin',
             size: 12
         },
         'A3' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11
         },
         'A4' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11
         },
         'A5' => {
@@ -38,12 +41,12 @@ workbook = {
             merge: 'E5'
         },
         'A6' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11,
             fill: 'c0c0c0'
         },
         'A7' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11,
             fill: 'c0c0c0'
         },
@@ -121,14 +124,14 @@ workbook = {
             formula: '=(C3-D3)',
             format: '0.00',
             align: 'right',
-            font: 'consolas',
+            font_size: 'consolas',
             fill: 'FFFFFF'
         },
         'E4' => {
             formula: '=E3+C4-D4',
             format: '0.00',
             align: 'right',
-            font: 'consolas',
+            font_size: 'consolas',
             fill: 'FFFFFF'
         },
         'E5' => {
@@ -147,7 +150,7 @@ workbook = {
     'A2.AR' => {
         'A1' => {
             value: 'Accounts Receivable',
-            name: 'consolas',
+            font_style: 'consolas',
             fill: 'c0c0c0',
             align: 'center',
             bold: true,
@@ -156,18 +159,18 @@ workbook = {
         },
         'A2' => {
             value: 'Date',
-            name: 'consolas',
+            font_style: 'consolas',
             align: 'center',
             fill: 'c0c0c0',
             border_all: 'thin',
             size: 12
         },
         'A3' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11
         },
         'A4' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11
         },
         'A5' => {
@@ -175,12 +178,12 @@ workbook = {
             merge: 'E5'
         },
         'A6' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11,
             fill: 'c0c0c0'
         },
         'A7' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11,
             fill: 'c0c0c0'
         },
@@ -258,14 +261,14 @@ workbook = {
             formula: '=(C3-D3)',
             format: '0.00',
             align: 'right',
-            font: 'consolas',
+            font_size: 'consolas',
             fill: 'FFFFFF'
         },
         'E4' => {
             formula: '=E3+C4-D4',
             format: '0.00',
             align: 'right',
-            font: 'consolas',
+            font_size: 'consolas',
             fill: 'FFFFFF'
         },
         'E5' => {
@@ -284,7 +287,7 @@ workbook = {
     'L1.CT' => {
         'A1' => {
             value: 'Corporation Tax',
-            name: 'consolas',
+            font_style: 'consolas',
             fill: 'c0c0c0',
             align: 'center',
             bold: true,
@@ -293,18 +296,18 @@ workbook = {
         },
         'A2' => {
             value: 'Date',
-            name: 'consolas',
+            font_style: 'consolas',
             align: 'center',
             fill: 'c0c0c0',
             border_all: 'thin',
             size: 12
         },
         'A3' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11
         },
         'A4' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11
         },
         'A5' => {
@@ -312,12 +315,12 @@ workbook = {
             merge: 'E5'
         },
         'A6' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11,
             fill: 'c0c0c0'
         },
         'A7' => {
-            name: 'consolas',
+            font_style: 'consolas',
             size: 11,
             fill: 'c0c0c0'
         },
@@ -395,14 +398,14 @@ workbook = {
             formula: '=(C3-D3)',
             format: '0.00',
             align: 'right',
-            font: 'consolas',
+            font_size: 'consolas',
             fill: 'FFFFFF'
         },
         'E4' => {
             formula: '=E3+C4-D4',
             format: '0.00',
             align: 'right',
-            font: 'consolas',
+            font_size: 'consolas',
             fill: 'FFFFFF'
         },
         'E5' => {
