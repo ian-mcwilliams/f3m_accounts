@@ -11,17 +11,16 @@ class Excel
     end
   end
 
-  def save_file
+  def save_file(filepath)
     # rubyxl_workbook = hash_workbook_to_rubyxl_workbook
     # rubyxl_workbook.write(@hash_workbook[:filepath])
-    hash_workbook_to_rubyxl_workbook.write(@workbook[:filepath])
+    hash_workbook_to_rubyxl_workbook.write(filepath)
   end
 
   def hash_workbook_to_rubyxl_workbook
     rubyxl_workbook = RubyXL::Workbook.new
     first_worksheet = true
     @hash_workbook.each do |hash_key, hash_value|
-      next if [:filepath].include?(hash_key)
       if first_worksheet
         rubyxl_workbook.worksheets[0].sheet_name = hash_key
         first_worksheet = false
@@ -35,7 +34,7 @@ class Excel
 
   def hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
 
-    hash_worksheet.each do |hash_cell_key, hash_cell|
+    hash_worksheet[:cells].each do |hash_cell_key, hash_cell|
       hash_cell_to_rubyxl_cell(hash_cell_key, hash_cell, rubyxl_worksheet)
 
       # rubyxl_worksheet.change_column_width(column_index, hash_cell[:width]) if hash_cell[:width]
