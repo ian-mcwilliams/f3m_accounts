@@ -76,4 +76,42 @@ class Excel
     rubyxl_workbook = RubyXL::Parser.parse(path)
     @hash_workbook = rubyxl_to_hash(rubyxl_workbook)
   end
+
+  def rubyxl_to_hash(rubyxl_workbook)
+    workbook_hash = {}
+    rubyxl_workbook.each do |worksheet|
+      worksheet_hash = {row_count: worksheet.count, column_count: 1, cells: {}}
+      worksheet_to_hash(worksheet, worksheet_hash)
+      process_sheet_to_populated_block(worksheet_hash)
+      workbook_hash[worksheet.sheet_name] = worksheet_hash
+    end
+    workbook_hash
+  end
+
+  def worksheet_to_hash(worksheet, worksheet_hash)
+    worksheet.each_with_index do |row, row_index|
+      cells = row&.cells
+      if cells.nil?
+        cell_hash = {}
+        cell_key = RubyXL::Reference.ind2ref(row_index, 0)
+        worksheet_hash[cell_key] = cell_hash
+      else
+        row&.cells.each_with_index do |cell, column_index|
+          cell_hash = {}
+          cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
+          worksheet_hash[:cells][cell_key] = cell_hash
+          worksheet_hash[:column_count] = column_index + 1 if column_index + 1 > worksheet_hash[:column_count]
+        end
+      end
+    end
+  end
+
+  def process_sheet_to_populated_block(worksheet_hash)
+    worksheet_hash[:row_count].times do |row_index|
+      worksheet_hash[:column_count].times do |column_index|
+        cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
+        worksheet_hash[cell_key] = {} unless worksheet_hash[cell_key]
+      end
+    end
+  end
 end
