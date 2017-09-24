@@ -10,9 +10,9 @@ hash_workbook = {}
 sheet_names.each do |sheet_name|
   current_worksheet = {
       sheet_name => {
-          # worksheet: {
-          #     font_style: 'consolas'
-          # },
+          worksheet: {
+              font_style: 'consolas'
+          },
           cells: {
               'A1' => {
                   value: sheet_name,

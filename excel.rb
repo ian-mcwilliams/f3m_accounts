@@ -33,6 +33,10 @@ class Excel
   end
 
   def hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
+    hash_worksheet[:worksheet].each do |hash_cell_key, hash_cell|
+      rubyxl_worksheet.change_column_font_name(0, 'Consolas')
+      rubyxl_worksheet.change_row_font_name(0, 'Consolas')
+    end
 
     hash_worksheet[:cells].each do |hash_cell_key, hash_cell|
       hash_cell_to_rubyxl_cell(hash_cell_key, hash_cell, rubyxl_worksheet)
