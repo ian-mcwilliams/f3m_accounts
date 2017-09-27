@@ -97,7 +97,7 @@ class Excel
         hash_cell_key = RubyXL::Reference.ind2ref(rubyxl_row_index, 0)
         hash_worksheet[hash_cell_key] = hash_cell
       else
-        rubyxl_row_cells.each_with_index do |hash_cell, rubyxl_column_index|
+        rubyxl_row_cells.each_with_index do |rubyxl_cell, rubyxl_column_index|
           hash_cell = {}
           hash_cell_key = RubyXL::Reference.ind2ref(rubyxl_row_index, rubyxl_column_index)
           hash_worksheet[:cells][hash_cell_key] = hash_cell
