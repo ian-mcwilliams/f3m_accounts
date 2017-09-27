@@ -33,33 +33,14 @@ class Excel
   end
 
   def hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
-    # 1. add all of the cells
-    # 1.1 get the number of rows and columns
 
-
-
-    # hash_worksheet[:worksheet].each do |hash_cell_key, hash_cell|
-    #   rubyxl_worksheet.change_row_font_name(0, hash_cell[:row_font_name])
-    #   rubyxl_worksheet.change_column_font_name(0, hash_cell[:column_font_name])
-    # end
-    worksheet = hash_worksheet[:worksheet]
-    # rubyxl_worksheet.change_row_font_name(worksheet[:row_number], worksheet[:row_font_name])
-    # rubyxl_worksheet.change_column_font_name(worksheet[:column_number], worksheet[:column_font_name])
-    (0..(worksheet[:row_count])).to_a.each do |item1|
-      rubyxl_worksheet.change_row_font_name(item1, worksheet[:row_font_name])
-      rubyxl_worksheet
-      (0..(worksheet[:column_count])).to_a.each do |item2|
-        rubyxl_worksheet.change_column_font_name(item2, worksheet[:column_font_name])
-        rubyxl_worksheet.add_cell(item1, item2, '')
-      end
-    end
-
-    # rubyxl_worksheet.change_column_width(column_index, hash_cell[:width]) if hash_cell[:width]
-    #
-    # rubyxl_worksheet.change_row_font_name(row_index, hash_cell[:name]) if hash_cell[:name]
-    # rubyxl_worksheet.change_row_font_size(row_index, hash_cell[:size])  if hash_cell[:size]
     hash_worksheet[:cells].each do |hash_cell_key, hash_cell|
       hash_cell_to_rubyxl_cell(hash_cell_key, hash_cell, rubyxl_worksheet)
+
+      # rubyxl_worksheet.change_column_width(column_index, hash_cell[:width]) if hash_cell[:width]
+      #
+      # rubyxl_worksheet.change_row_font_name(row_index, hash_cell[:name]) if hash_cell[:name]
+      # rubyxl_worksheet.change_row_font_size(row_index, hash_cell[:size])  if hash_cell[:size]
     end
   end
 
