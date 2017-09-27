@@ -33,6 +33,10 @@ class Excel
   end
 
   def hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
+    hash_worksheet[:worksheet].each do |hash_cell_key, hash_cell|
+      rubyxl_worksheet.change_column_font_name(0, 'Consolas')
+      rubyxl_worksheet.change_row_font_name(0, 'Consolas')
+    end
 
     hash_worksheet[:cells].each do |hash_cell_key, hash_cell|
       hash_cell_to_rubyxl_cell(hash_cell_key, hash_cell, rubyxl_worksheet)
@@ -72,46 +76,45 @@ class Excel
       rubyxl_worksheet[row_index][column_index].change_border('right' , hash_cell[:border_all])
     end
   end
-
   def read_file(path)
     rubyxl_workbook = RubyXL::Parser.parse(path)
-    @hash_workbook = rubyxl_workbook_to_hash_workbook(rubyxl_workbook)
+    @hash_workbook = rubyxl_to_hash(rubyxl_workbook)
   end
 
-  def rubyxl_workbook_to_hash_workbook(rubyxl_workbook)
-    hash_workbook = {}
-    rubyxl_workbook.each do |rubyxl_worksheet|
-      hash_worksheet = {row_count: rubyxl_worksheet.count, column_count: 1, cells: {}}
-      rubyxl_worksheet_to_hash_worksheet(rubyxl_worksheet, hash_worksheet)
-      populate_hash_worksheet_cells_to_block(hash_worksheet)
-      hash_workbook[rubyxl_worksheet.sheet_name] = hash_worksheet
+  def rubyxl_to_hash(rubyxl_workbook)
+    workbook_hash = {}
+    rubyxl_workbook.each do |worksheet|
+      worksheet_hash = {row_count: worksheet.count, column_count: 1, cells: {}}
+      worksheet_to_hash(worksheet, worksheet_hash)
+      process_sheet_to_populated_block(worksheet_hash)
+      workbook_hash[worksheet.sheet_name] = worksheet_hash
     end
-    hash_workbook
+    workbook_hash
   end
 
-  def rubyxl_worksheet_to_hash_worksheet(rubyxl_worksheet, hash_worksheet)
-    rubyxl_worksheet.each_with_index do |rubyxl_row, rubyxl_row_index|
-      rubyxl_row_cells = rubyxl_row&.cells
-      if rubyxl_row_cells.nil?
-        hash_cell = {}
-        hash_cell_key = RubyXL::Reference.ind2ref(rubyxl_row_index, 0)
-        hash_worksheet[hash_cell_key] = hash_cell
+  def worksheet_to_hash(worksheet, worksheet_hash)
+    worksheet.each_with_index do |row, row_index|
+      cells = row&.cells
+      if cells.nil?
+        cell_hash = {}
+        cell_key = RubyXL::Reference.ind2ref(row_index, 0)
+        worksheet_hash[cell_key] = cell_hash
       else
-        rubyxl_row_cells.each_with_index do |hash_cell, rubyxl_column_index|
-          hash_cell = {}
-          hash_cell_key = RubyXL::Reference.ind2ref(rubyxl_row_index, rubyxl_column_index)
-          hash_worksheet[:cells][hash_cell_key] = hash_cell
-          hash_worksheet[:column_count] = rubyxl_column_index + 1 if rubyxl_column_index + 1 > hash_worksheet[:column_count]
+        row&.cells.each_with_index do |cell, column_index|
+          cell_hash = {}
+          cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
+          worksheet_hash[:cells][cell_key] = cell_hash
+          worksheet_hash[:column_count] = column_index + 1 if column_index + 1 > worksheet_hash[:column_count]
         end
       end
     end
   end
 
-  def populate_hash_worksheet_cells_to_block(hash_worksheet)
-    hash_worksheet[:row_count].times do |hash_row_index|
-      hash_worksheet[:column_count].times do |hash_column_index|
-        hash_cell_key = RubyXL::Reference.ind2ref(hash_row_index, hash_column_index)
-        hash_worksheet[hash_cell_key] = {} unless hash_worksheet[hash_cell_key]
+  def process_sheet_to_populated_block(worksheet_hash)
+    worksheet_hash[:row_count].times do |row_index|
+      worksheet_hash[:column_count].times do |column_index|
+        cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
+        worksheet_hash[cell_key] = {} unless worksheet_hash[cell_key]
       end
     end
   end
