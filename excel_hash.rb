@@ -4,24 +4,25 @@ require_relative 'excel'
 timestamp = DateTime.now.strftime('%y%m%d_%H%M%S')
 filepath = "tempxlsx/file_#{timestamp}.xlsx"
 
-sheet_names = %w[A1.Cash A2.AR L1.CT]
+sheet_names = %w[A1.Cash] # A2.AR L1.CT]
 
 hash_workbook = {}
 sheet_names.each do |sheet_name|
   current_worksheet = {
       sheet_name => {
           worksheet: {
-              row_count: 7,
-              column_count: 4,
-              row_number: 0,
-              row_font_name: 'Consolas',
-              column_number: 0,
-              column_font_name: 'Consolas'
+              font_style: 'Consolas',
+              # row_count: 7,
+              # column_count: 4,
+              # row_number: 0,
+              # row_font_name: 'Consolas',
+              # column_number: 0,
+              # column_font_name: 'Consolas'
           },
           cells: {
               'A1' => {
                   value: sheet_name,
-                  font_style: 'consolas',
+                  font_style: 'arial',
                   fill: 'c0c0c0',
                   align: 'center',
                   bold: true,
