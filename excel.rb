@@ -4,16 +4,27 @@ class Excel
   attr_accessor :hash_workbook
 
   def initialize(source: nil)
-    if source.class == Hash
+    if source.is_a?(Hash)
       @hash_workbook = source
-    elsif source.class == String
+    elsif source.ia_a?(String)
       read_file(source)
     end
   end
 
+  def validate_hash_workbook
+    raise("@hash_workbook is class '#{@hash_workbook.class}', should be a Hash") unless @hash_workbook.is_a?(Hash)
+    @validation = []
+    @hash_workbook.each { |hash_worksheet_name, hash_worksheet| validate_hash_worksheet(hash_worksheet_name, hash_worksheet) }
+    raise(@validation.join("\n")) unless @validation.empty?
+  end
+
+  def validate_hash_worksheet(hash_worksheet_name, hash_worksheet)
+    @validation << "hash_worksheet_name is class '#{hash_worksheet_name.class}', should be a String" unless hash_worksheet_name.is_a?(String)
+    # other validation...
+  end
+
   def save_file(filepath)
-    # rubyxl_workbook = hash_workbook_to_rubyxl_workbook
-    # rubyxl_workbook.write(@hash_workbook[:filepath])
+    validate_hash_workbook
     hash_workbook_to_rubyxl_workbook.write(filepath)
   end
 
@@ -32,44 +43,65 @@ class Excel
     rubyxl_workbook
   end
 
-  def hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
-
-    hash_worksheet[:cells].each do |hash_cell_key, hash_cell|
-      hash_cell_to_rubyxl_cell(hash_cell_key, hash_cell, rubyxl_worksheet)
-
-      # rubyxl_worksheet.change_column_width(column_index, hash_cell[:width]) if hash_cell[:width]
-      #
-      # rubyxl_worksheet.change_row_font_name(row_index, hash_cell[:name]) if hash_cell[:name]
-      # rubyxl_worksheet.change_row_font_size(row_index, hash_cell[:size])  if hash_cell[:size]
+  def set_hash_worksheet_extents(hash_worksheet)
+    row_keys = hash_worksheet[:rows].keys.map { |item| "A#{item}" }
+    column_keys = hash_worksheet[:columns].keys.map { |item| "#{item}1" }
+    hash_worksheet[:row_count] = 0
+    hash_worksheet[:column_count] = 0
+    (hash_worksheet[:cells].keys + row_keys + column_keys).each do |hash_cell_key|
+      row_index, column_index = RubyXL::Reference.ref2ind(hash_cell_key)
+      hash_worksheet[:row_count] = row_index + 1 if row_index >= hash_worksheet[:row_count]
+      hash_worksheet[:column_count] = column_index + 1 if column_index >= hash_worksheet[:column_count]
     end
   end
 
-  def hash_cell_to_rubyxl_cell(hash_cell_key, hash_cell, rubyxl_worksheet)
-    row_index, column_index = RubyXL::Reference.ref2ind(hash_cell_key)
-
-    index_b, index_a = RubyXL::Reference.ref2ind(hash_cell[:merge]) if hash_cell[:merge]
-    rubyxl_worksheet.merge_cells(row_index, column_index, index_a, index_b) if hash_cell[:merge]
-    if hash_cell[:formula]
-      rubyxl_worksheet.add_cell(row_index, column_index, '', hash_cell[:formula]).set_number_format '0.00'
-    else
-      rubyxl_worksheet.add_cell(row_index, column_index, hash_cell[:value])
+  def hash_worksheet_to_rubyxl_worksheet(hash_worksheet, rubyxl_worksheet)
+    process_sheet_to_populated_block(hash_worksheet)
+    hash_worksheet[:cells].sort.each do |hash_cell_key, hash_cell|
+      combined_hash_cell = get_combined_hash_cell(hash_worksheet, hash_cell_key, hash_cell)
+      row_index, column_index = RubyXL::Reference.ref2ind(hash_cell_key)
+      add_rubyxl_cells(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
+      hash_cell_to_rubyxl_cell(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
     end
+  end
 
-    rubyxl_worksheet[row_index][column_index].change_contents(hash_cell[:sum], rubyxl_worksheet[row_index][column_index].formula) if hash_cell[:sum]
+  def get_combined_hash_cell(hash_worksheet, hash_cell_key, hash_cell)
+    # first get data from the matching column if it's specified
+    column_keys = hash_worksheet[:columns].keys.select { |key| hash_cell_key =~ /^#{key}\d+$/ }
+    column_keys.empty? ? hash_column = {} : hash_column = hash_worksheet[:columns][column_keys[0]]
+    combined_hash_cell = hash_column.merge(hash_cell)
+    # then get data from the matching row if it's specified
+    row_keys = hash_worksheet[:rows].keys.select { |key| hash_cell_key =~ /^\D+#{key}$/ }
+    row_keys.empty? ? hash_row = {} : hash_row = hash_worksheet[:rows][row_keys[0]]
+    combined_hash_cell = hash_row.merge(combined_hash_cell)
+    hash_worksheet[:worksheet].merge(combined_hash_cell)
+  end
 
+  def add_rubyxl_cells(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
+    if combined_hash_cell[:formula]
+      rubyxl_worksheet.add_cell(row_index, column_index, '', combined_hash_cell[:formula]).set_number_format combined_hash_cell[:dp_2]
+    else
+      rubyxl_worksheet.add_cell(row_index, column_index, combined_hash_cell[:value])
+    end
+  end
 
+  def hash_cell_to_rubyxl_cell(combined_hash_cell, rubyxl_worksheet, row_index, column_index)
+    merge_row_index, merge_column_index = RubyXL::Reference.ref2ind(combined_hash_cell[:merge])
 
-    rubyxl_worksheet[row_index][column_index].set_number_format(hash_cell[:format]) if hash_cell[:format]
-    rubyxl_worksheet[row_index][column_index].change_fill(hash_cell[:fill]) if hash_cell[:fill]
-    rubyxl_worksheet[row_index][column_index].change_horizontal_alignment(hash_cell[:align]) if hash_cell[:align]
-    rubyxl_worksheet[row_index][column_index].set_number_format(hash_cell[:format]) if hash_cell[:format]
-    rubyxl_worksheet[row_index][column_index].change_font_bold(hash_cell[:bold]) if hash_cell[:bold]
+    rubyxl_worksheet.merge_cells(row_index, column_index, merge_column_index, merge_row_index) if combined_hash_cell[:merge]
+    rubyxl_worksheet.change_column_width(column_index, combined_hash_cell[:width])  if combined_hash_cell[:width]
 
-    if hash_cell[:border_all]
-      rubyxl_worksheet[row_index][column_index].change_border('top' , hash_cell[:border_all])
-      rubyxl_worksheet[row_index][column_index].change_border('bottom' , hash_cell[:border_all])
-      rubyxl_worksheet[row_index][column_index].change_border('left' , hash_cell[:border_all])
-      rubyxl_worksheet[row_index][column_index].change_border('right' , hash_cell[:border_all])
+    rubyxl_worksheet[row_index][column_index].change_font_name(combined_hash_cell[:font_style]) if combined_hash_cell[:font_style]
+    rubyxl_worksheet[row_index][column_index].change_font_size(combined_hash_cell[:font_size]) if combined_hash_cell[:font_size]
+    rubyxl_worksheet[row_index][column_index].change_fill(combined_hash_cell[:fill]) if combined_hash_cell[:fill]
+    rubyxl_worksheet[row_index][column_index].change_horizontal_alignment(combined_hash_cell[:align]) if combined_hash_cell[:align]
+    rubyxl_worksheet[row_index][column_index].change_font_bold(combined_hash_cell[:bold]) if combined_hash_cell[:bold]
+
+    if combined_hash_cell[:border_all]
+      rubyxl_worksheet[row_index][column_index].change_border('top' , combined_hash_cell[:border_all])
+      rubyxl_worksheet[row_index][column_index].change_border('bottom' , combined_hash_cell[:border_all])
+      rubyxl_worksheet[row_index][column_index].change_border('left' , combined_hash_cell[:border_all])
+      rubyxl_worksheet[row_index][column_index].change_border('right' , combined_hash_cell[:border_all])
     end
   end
 
@@ -107,12 +139,19 @@ class Excel
     end
   end
 
-  def populate_hash_worksheet_cells_to_block(hash_worksheet)
-    hash_worksheet[:row_count].times do |hash_row_index|
-      hash_worksheet[:column_count].times do |hash_column_index|
-        hash_cell_key = RubyXL::Reference.ind2ref(hash_row_index, hash_column_index)
-        hash_worksheet[hash_cell_key] = {} unless hash_worksheet[hash_cell_key]
+  def process_sheet_to_populated_block(hash_worksheet)
+    set_hash_worksheet_extents(hash_worksheet)
+    hash_worksheet[:row_count].times do |row_index|
+      hash_worksheet[:column_count].times do |column_index|
+        cell_key = RubyXL::Reference.ind2ref(row_index, column_index)
+        hash_worksheet[:cells][cell_key] = {} unless hash_worksheet[:cells][cell_key]
       end
     end
+  end
+
+  def excel_col_index(hash_worksheet)
+    column_no = ()
+    value = Hash[ ('A'..'Z').map.with_index.to_a ]
+    hash_worksheet[column_no] = hash_worksheet[:columns][:column_ref].chars.inject(0){ |x,c| x*26 + value[c] + 1}
   end
 end
