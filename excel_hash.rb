@@ -1,5 +1,6 @@
 require 'date'
 require_relative 'excel'
+require 'awesome_print'
 
 timestamp = DateTime.now.strftime('%y%m%d_%H%M%S')
 filepath = "tempxlsx/file_#{timestamp}.xlsx"
@@ -11,152 +12,121 @@ sheet_names.each do |sheet_name|
   current_worksheet = {
       sheet_name => {
           worksheet: {
-              font_style: 'Times New Roman',
+              font_style: 'Consolas',
               font_size: 11,
-              dp_2: '0.00'
+              dp_2: '0.00',
+              border_all: 'thin'
           },
           rows: {
-              # Selected rows (project extents) define fill and border
-              font_style: 'Consolas'
+              '1' => {
+                  font_style: 'Arial',
+                  fill: 'c0c0c0',
+                  align: 'center',
+                  bold: true,
+                  border_all: 'thin'
+              },
+              '2' => {
+                  font_style: 'Arial',
+                  fill: 'c0c0c0',
+                  align: 'center',
+                  bold: true,
+                  border_all: 'thin'
+              },
+              '6' => {
+                  fill: 'c0c0c0',
+                  align: 'right',
+                  border_all: 'none'
+              },
+              '7' => {
+                  fill: 'c0c0c0',
+                  align: 'right',
+                  border_all: 'none'
+              },
+              '5' => {
+                  fill: '808080',
+                  border_all: 'none'
+              },
+              '8' => {
+                  fill: '808080',
+                  border_all: 'none'
+              }
           },
           columns: {
-              # Selected columns (project extents) define width, alignment, number type and decimalisation
+
           },
           cells: {
               'A1' => {
-                  font_style: 'Arial',
                   value: sheet_name,
-                  fill: 'c0c0c0',
-                  align: 'center',
-                  bold: true,
-                  merge: 'A5',
-                  font_size: 13
+                  font_size: 13,
+                  merge: 'A5'
               },
               'A2' => {
-                  font_style: 'Arial',
-                  font_size: 12,
                   value: 'Date',
-                  align: 'center',
-                  bold: true,
-                  fill: 'c0c0c0',
-                  border_all: 'thin'
-              },
-              'A5' => {
-                  fill: '808080',
-                  merge: 'E5'
-              },
-              'A6' => {
-                  fill: 'c0c0c0'
-              },
-              'A7' => {
-                  fill: 'c0c0c0'
-              },
-              'A8' => {
-                  fill: '808080',
-                  merge: 'H5'
+                  font_size: 12
               },
               'B2' => {
-                  font_style: 'Arial',
-                  font_size: 12,
                   value: 'Description',
-                  align: 'center',
-                  fill: 'c0c0c0',
-                  bold: true,
-                  border_all: 'thin',
                   width: 40
               },
-              'B5' => {
-                  fill: '808080'
-              },
               'B6' => {
-                  value: 'Totals',
-                  align: 'right',
-                  fill: 'c0c0c0'
+                  value: 'Totals'
               },
               'B7' => {
-                  value: 'Balance',
-                  align: 'right',
-                  fill: 'c0c0c0'
+                  value: 'Balance'
               },
               'C2' => {
-                  font_style: 'Arial',
-                  font_size: 12,
-                  value: 'Dr',
-                  align: 'center',
-                  bold: true,
-                  fill: 'c0c0c0',
-                  border_all: 'thin'
-              },
-              'C5' => {
-                  fill: '808080'
+                  value: 'Dr'
               },
               'C6' => {
                   formula: '=sum(C2:C5)',
-                  align: 'right',
-                  fill: 'c0c0c0'
+                  border_all: 'thin'
               },
               'C7' => {
                   formula: '=IF(C6-D6>0, C6-D6, 0)',
-                  align: 'right',
-                  fill: 'c0c0c0'
-              },
-              'D2' => {
-                  font_style: 'Arial',
-                  font_size: 12,
-                  value: 'Cr',
-                  align: 'center',
-                  bold: true,
-                  fill: 'c0c0c0',
                   border_all: 'thin'
               },
-              'D5' => {
-                  fill: '808080'
+              'D2' => {
+                  value: 'Cr'
               },
               'D6' => {
                   formula: '=SUM(D2:D5)',
-                  align: 'right',
-                  fill: 'c0c0c0'
+                  border_all: 'thin'
               },
               'D7' => {
                   formula: '=IF(D6-C6>0, D6-C6, 0)',
-                  align: 'right',
-                  fill: 'c0c0c0'
-              },
-              'E2' => {
-                  font_style: 'Arial',
-                  font_size: 12,
-                  value: 'Balance',
-                  align: 'center',
-                  bold: true,
-                  fill: 'c0c0c0',
                   border_all: 'thin'
               },
+              'E2' => {
+                  value: 'Balance',
+              },
               'E3' => {
-                  formula: '=C3-D3',
-                  align: 'right',
-                  fill: 'FFFFFF'
-              },
-              'E4' => {
-                  formula: '=E3+C4-D4',
-                  align: 'right',
-                  fill: 'FFFFFF'
-              },
-              'E5' => {
-                  fill: '808080'
+                  formula: '=IF(sum(C3:D3)=0,sum(C3:D3), C3-D3)'
               },
               'E6' => {
-                  fill: 'c0c0c0'
+                  border_all: 'thin'
               },
               'E7' => {
                   formula: '=C7-D7',
-                  align: 'right',
-                  fill: 'c0c0c0'
+                  border_all: 'thin'
               },
           }
       }
   }
   hash_workbook.update(current_worksheet)
 end
-
+# ap hash_workbook
 excel_object = Excel.new(source: hash_workbook)
 excel_object.save_file(filepath)
+
+
+# if combined_hash_cell[:balance] || combined_hash_cell[:cr_balance]
+#   balance = hash_cell_key.sub((/\d+/), row_index.to_s)
+#   dr = hash_cell_key.sub(/\D+/, "C")
+#   cr = hash_cell_key.sub(/\D+/, "D")
+#   if combined_hash_cell[:cr_balance]
+#     balance = "=#{balance}+#{cr}-#{dr}"
+#   else
+#     balance = "=#{balance}+#{dr}-#{cr}"
+#   end
+#   rubyxl_worksheet[row_index][column_index].change_contents(combined_hash_cell[:balance].to_s, balance)
+# end
