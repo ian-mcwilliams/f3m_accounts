@@ -15,7 +15,7 @@ sheet_names.each do |sheet_name|
   excel_object.hash_workbook[sheet_name].update(sample_worksheet(sheet_name))
 end
 
-# ap hash_workbook
+# ap excel_object.hash_workbook
 excel_object.save_file(filepath)
 
 
